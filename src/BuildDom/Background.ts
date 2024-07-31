@@ -45,7 +45,7 @@ function componentToHex(c: number) {
  * 
  */
 
-function handleSvg(self: SceneNode, rescriptDom: RescriptBuildTree) {
+async function handleSvg(self: SceneNode, rescriptDom: RescriptBuildTree) {
     const clonedSelf = self.clone();
     if ((clonedSelf as ChildrenMixin).children) {
         (clonedSelf as ChildrenMixin).children.forEach(ele => {
@@ -54,7 +54,7 @@ function handleSvg(self: SceneNode, rescriptDom: RescriptBuildTree) {
     }
     const settings = { format: 'SVG_STRING' } as ExportSettingsSVGString;
     const callback = clonedSelf.exportAsync(settings);
-    callback.then((onfulfilled) => {
+    await callback.then((onfulfilled) => {
         if (onfulfilled) {
             rescriptDom.childrens.unshift(createSVGWithString(onfulfilled, self, rescriptDom))
             clonedSelf.remove()

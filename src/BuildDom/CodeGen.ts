@@ -1,12 +1,13 @@
+import { getImageNode, isImageNode } from "./Image"
 import getTextProps from "./Text"
 import { RescriptBuildTree } from "./Types"
 import getViewProps from "./View"
 
 function buildRescript(figmaNode: ReadonlyArray<SceneNode>, rescriptBuildTree: RescriptBuildTree) {
     console.log("inside buildRescript")
-    figmaNode.forEach(q => {
-        generateCode(q, rescriptBuildTree)
-    })
+    for (let i = 0; i< figmaNode.length; i++) {
+        generateCode(figmaNode.at(i)!, rescriptBuildTree,i)
+    }
     console.log("after buildRescript",rescriptBuildTree)
     // switch (figmaNode) {
     //     case SliceNode: {
@@ -73,18 +74,19 @@ function buildRescript(figmaNode: ReadonlyArray<SceneNode>, rescriptBuildTree: R
 }
 
 
-function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree) {
-    const currentDom = buildNodeOrLeaf(dom, rescriptDom)
-    console.log(dom)
-    if ((dom as ChildrenMixin).children) {
-        (dom as ChildrenMixin).children.forEach(ele => {
-            generateCode(ele, currentDom)
-        })
-    }
-    rescriptDom.childrens.push(currentDom);
+function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree, index:number) {
+    buildNodeOrLeaf(dom, rescriptDom).then((currentDom) => {
+        if ((dom as ChildrenMixin).children) {
+            const children = (dom as ChildrenMixin).children;
+            for (let i = 0 ; i < children.length; i++){
+                generateCode(children.at(i)!, currentDom,i);
+            }
+        }
+        rescriptDom.childrens.splice(index,0,currentDom);
+    })
 }
 
-function buildNodeOrLeaf(dom: SceneNode, rescriptDom: RescriptBuildTree) {
+async function buildNodeOrLeaf(dom: SceneNode, rescriptDom: RescriptBuildTree) {
     const currentDom: RescriptBuildTree = {
         type: getRescriptType(dom.type),
         props: {
@@ -96,10 +98,10 @@ function buildNodeOrLeaf(dom: SceneNode, rescriptDom: RescriptBuildTree) {
     }
     if (currentDom.type == "Text") {
         currentDom.props = getTextProps(dom)
+        currentDom.childrens.push("{" + (dom as TextNode).characters + "}")
+    } else if (isImageNode(dom)) {
+        await getImageNode(dom,currentDom)
     }
-
-
-
     getViewProps(dom, currentDom)
     return currentDom;
 }
