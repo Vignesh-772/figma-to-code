@@ -1,0 +1,14 @@
+<h2>Rescript Code Generator</h2>
+<button id="generate">Generate</button>
+<button id="close">Close</button>
+<script>
+
+document.getElementById('generate').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'generate-code'} }, '*')
+}
+
+document.getElementById('close').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'close' } }, '*')
+}
+
+</script>
