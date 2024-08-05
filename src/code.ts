@@ -15,7 +15,7 @@ figma.showUI(__html__);
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
-figma.ui.onmessage =  (msg: {type: string}) => {
+figma.ui.onmessage =  async (msg: {type: string}) => {
   // One way of distinguishing between different types of messages sent from
   // your HTML page is to use an object with a "type" property like this.
   if (msg.type === 'generate-code') {
@@ -30,7 +30,7 @@ figma.ui.onmessage =  (msg: {type: string}) => {
       childrens: [],
       parent: undefined
     }
-    buildRescript(figma.currentPage.selection,rescriptNode)
+    await buildRescript(figma.currentPage.selection,rescriptNode)
     // figma.closePlugin();
     // buildRescript()
   } else if (msg.type === 'close') {
