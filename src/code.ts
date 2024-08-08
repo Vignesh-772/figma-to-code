@@ -25,6 +25,7 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
       type: "View",
       props: {
         props: [],
+        textStyle: [],
         styles: []
       },
       childrens: [],

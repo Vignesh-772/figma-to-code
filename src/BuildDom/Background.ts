@@ -9,7 +9,7 @@ export const handleFills = function(fills: Paint, self: SceneNode, rescriptDom: 
         case "SOLID": {
             backgroundProps.push({
                 key: "backgroundColor",
-                value: RGBtoHexString(fills.color)
+                value: JSON.stringify(RGBtoHexString(fills.color))
             }); break;
         }
         case "GRADIENT_LINEAR": {
@@ -25,10 +25,10 @@ export const handleFills = function(fills: Paint, self: SceneNode, rescriptDom: 
     if (fills.opacity) {
         backgroundProps.push({
             key: "opacity",
-            value: fills.opacity
+            value: fills.opacity.toFixed(1)
         })
     }
-    rescriptDom.props.props.concat(backgroundProps);
+    backgroundProps.forEach((element) => {rescriptDom.props.styles.push(element)});
 }
 
 function RGBtoHexString(color: RGB) {
@@ -36,10 +36,15 @@ function RGBtoHexString(color: RGB) {
 }
 
 function componentToHex(c: number) {
-    const hex = c.toString(16);
+    const hex = (Math.ceil(mapNumRange(c,0,1,0,255))).toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
 
+
+const mapNumRange = (num: number, inMin: number, inMax: number, outMin: number, outMax: number) =>
+    ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+  
+  
 /**
  * THis will work only with react-svgs
  * 
@@ -79,10 +84,10 @@ export const handleStroke = function(fills: Paint, rescriptDom: RescriptBuildTre
     if (fills.opacity) {
         backgroundProps.push({
             key: "opacity",
-            value: fills.opacity
+            value: fills.opacity.toFixed(1)
         })
     }
-    rescriptDom.props.props.concat(backgroundProps);
+    rescriptDom.props.styles.concat(backgroundProps);
 }
 
 export const handleStrokeWeight = function(node: SceneNode, rescriptDom: RescriptBuildTree) {
@@ -91,25 +96,25 @@ export const handleStrokeWeight = function(node: SceneNode, rescriptDom: Rescrip
         if (strokeNode.strokeBottomWeight) {
             rescriptDom.props.styles.push({
                 key: "borderBottomWidth",
-                value: strokeNode.strokeBottomWeight
+                value: strokeNode.strokeBottomWeight.toFixed(1)
             });
         }
         if (strokeNode.strokeLeftWeight) {
             rescriptDom.props.styles.push({
                 key: "borderLeftWidth",
-                value: strokeNode.strokeLeftWeight
+                value: strokeNode.strokeLeftWeight.toFixed(1)
             });
         }
         if (strokeNode.strokeRightWeight) {
             rescriptDom.props.styles.push({
                 key: "borderRightWidth",
-                value: strokeNode.strokeRightWeight
+                value: strokeNode.strokeRightWeight.toFixed(1)
             });
         }
         if (strokeNode.strokeTopWeight) {
             rescriptDom.props.styles.push({
                 key: "borderTopWidth",
-                value: strokeNode.strokeTopWeight
+                value: strokeNode.strokeTopWeight.toFixed(1)
             });
         }
     }

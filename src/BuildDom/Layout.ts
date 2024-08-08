@@ -5,37 +5,37 @@ export const handleLayout = function(node: SceneNode, rescriptDom: RescriptBuild
         const layout = node as LayoutMixin;
         let shouldSetFlex = false;
         if (layout.height) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "height",
-                value: !(layout.layoutSizingVertical == "FIXED") && isHeightMatchParent(node) ? "100%" : layout.height + "px"
+                value: !(layout.layoutSizingVertical == "FIXED") && isHeightMatchParent(node) ? "100%" : JSON.stringify(layout.height + "px")
             });
         }
         if (layout.width) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "width",
-                value: !(layout.layoutSizingHorizontal == "FIXED") && isWidthMatchParent(node) ? "100%" : layout.width + "px"
+                value: !(layout.layoutSizingHorizontal == "FIXED") && isWidthMatchParent(node) ? "100%" : JSON.stringify(layout.width + "px")
             });
         }
         if (layout.minHeight) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "minHeight",
                 value: layout.minHeight + "px"
             });
         }
         if (layout.maxHeight) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "maxHeight",
                 value: layout.maxHeight + "px"
             });
         }
         if (layout.minWidth) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "minWidth",
                 value: layout.minWidth + "px"
             });
         }
         if (layout.maxWidth) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "maxWidth",
                 value: layout.maxWidth + "px"
             });
@@ -49,30 +49,30 @@ export const handleLayout = function(node: SceneNode, rescriptDom: RescriptBuild
         if (layout.layoutSizingHorizontal || layout.layoutSizingVertical) {
             shouldSetFlex = true;
             if (layout.layoutSizingHorizontal == "HUG") {
-                rescriptDom.props.props.push({
+                rescriptDom.props.styles.push({
                     key: "flexDirection",
                     value: "row"
                 });
-                rescriptDom.props.props.push({
+                rescriptDom.props.styles.push({
                     key: "flexWrap",
                     value: "wrap"
                 });
             }
             if (layout.layoutSizingVertical == "HUG") {
-                rescriptDom.props.props.push({
+                rescriptDom.props.styles.push({
                     key: "flexDirection",
                     value: "column"
                 });
-                rescriptDom.props.props.push({
+                rescriptDom.props.styles.push({
                     key: "flexWrap",
                     value: "wrap"
                 });
             }
         }
         if (shouldSetFlex) {
-            rescriptDom.props.props.push({
+            rescriptDom.props.styles.push({
                 key: "flex",
-                value: "1"
+                value: "1.0"
             });
         }
     }
