@@ -5,6 +5,7 @@ export type Props = {
 
 export type DomProps = {
     props: Array<Props>,
+    textStyle: Array<Props>,
     styles: Array<Props>
 }
 

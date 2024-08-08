@@ -9,44 +9,44 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
         if (frameNode.clipsContent) {
             resultDom.props.styles.push({
                 key: "overflow",
-                value: "hidden"
+                value: "#hidden"
             })
         }
         if (frameNode.paddingBottom || frameNode.paddingLeft || frameNode.paddingRight || frameNode.paddingTop || frameNode.verticalPadding || frameNode.horizontalPadding){
             if (frameNode.paddingBottom ) {
                 resultDom.props.styles.push({
                     key: "paddingBottom",
-                    value: frameNode.paddingBottom + ""
+                    value: Math.floor(frameNode.paddingBottom) + ".->dp"
                 })
             }
             if (frameNode.paddingLeft ) {
                 resultDom.props.styles.push({
                     key: "paddingLeft",
-                    value: frameNode.paddingLeft + ""
+                    value: Math.floor(frameNode.paddingLeft) + ".->dp"
                 })
             }
             if (frameNode.paddingRight ) {
                 resultDom.props.styles.push({
                     key: "paddingRight",
-                    value: frameNode.paddingRight + ""
+                    value: Math.floor(frameNode.paddingRight) + ".->dp"
                 })
             }
             if (frameNode.paddingTop ) {
                 resultDom.props.styles.push({
                     key: "paddingTop",
-                    value: frameNode.paddingTop + ""
+                    value: Math.floor(frameNode.paddingTop) + ".->dp"
                 })
             }
             if (frameNode.verticalPadding ) {
                 resultDom.props.styles.push({
                     key: "paddingVertical",
-                    value: frameNode.verticalPadding + ""
+                    value: Math.floor(frameNode.verticalPadding) + ".->dp"
                 })
             }
             if (frameNode.horizontalPadding ) {
                 resultDom.props.styles.push({
                     key: "paddingHorizontal",
-                    value: frameNode.horizontalPadding + ""
+                    value: Math.floor(frameNode.horizontalPadding) + ".->dp"
                 })
             }
         }
@@ -60,18 +60,18 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
                 handleStroke(element,resultDom) 
             });
         }
-        if (frameNode.strokeWeight as number) {
+        if (typeof frameNode.strokeWeight === "number") {
             handleStrokeWeight(frameNode,resultDom)
         }
-        if (frameNode.cornerRadius as number) {
+        if (typeof frameNode.cornerRadius === "number") {
             resultDom.props.styles.push({
                 key: "borderRadius",
-                value: frameNode.cornerRadius as number
+                value: (frameNode.cornerRadius as number).toFixed(1)
             })
         }
         if(frameNode.layoutMode && frameNode.layoutMode != "NONE"){
             shouldSetFlex = true;
-            resultDom.props.props.push({
+            resultDom.props.styles.push({
                 key: "flexDirection",
                 value: getFlexDirection[frameNode.layoutMode]
             })
@@ -81,15 +81,15 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
     if (shouldSetFlex && resultDom.parent) {
         resultDom.parent.props.styles.push({
             key: "flex",
-            value: "1"
+            value: "1.0"
         })
     }
 }
 
 const getFlexDirection = {
     'NONE' : "",
-    'HORIZONTAL' : "row",
-    'VERTICAL': "column"
+    'HORIZONTAL' : "#row",
+    'VERTICAL': "#column"
 }
 
 

@@ -6,14 +6,15 @@ function createSVGWithString(svg: string, self: SceneNode, parent: RescriptBuild
         props: {
             props: [{
                 key: "xml"
-                , value: svg
+                , value: JSON.stringify(svg)
             }, {
                 key: "height"
-                , value: self.height
+                , value: JSON.stringify(self.height + "px")
             }, {
                 key: "width"
-                , value: self.width
+                , value: JSON.stringify(self.width +  "px")
             }],
+            textStyle: [],
             styles: []
         },
         childrens: [],
