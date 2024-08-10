@@ -14,4 +14,5 @@ export type RescriptBuildTree = {
     , props: DomProps
     , childrens: Array<RescriptBuildTree | string>
     , parent: RescriptBuildTree | undefined
+    , kind: 'Node' | 'Child'
 }

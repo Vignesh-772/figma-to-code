@@ -1,12 +1,31 @@
-<h2>Rescript Code Generator</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="style-sheet" href="./ui.css"/>
+  <title>Document</title>
+</head>
+<body>
+  <h2>Rescript Code Generator</h2>
 <button id="generate">Generate</button>
 <button id="close">Close</button>
-<div id="code_interface">
-<script src='http://lovasoa.github.io/tidy-html5/tidy.js'></script>
+<p id="code_interface"></p>
 
 
 </div>
 <script>
+
+onmessage = ((data)=>{ 
+  const area = document.createElement('textarea')
+  document.body.appendChild(area)
+  area.value = data.data.pluginMessage.data
+  area.focus()
+  area.select()
+  const result = document.execCommand('copy')
+  document.body.removeChild(area)
+  document.execCommand('copy')
+})
 
 document.getElementById('generate').onclick = () => {
   parent.postMessage({ pluginMessage: { type: 'generate-code'} }, '*')
@@ -17,3 +36,5 @@ document.getElementById('close').onclick = () => {
 }
 
 </script>
+</body>
+</html>

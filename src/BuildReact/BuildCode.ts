@@ -3,42 +3,41 @@ import { DomProps, Props, RescriptBuildTree } from "../BuildDom/Types";
 
 
 export function buildReactFromBuildTree(buildTree: RescriptBuildTree, level: number): string {
-    const prefix = "let make= () => {\n" + getTabSpaces(level + 1);
+    // const prefix = "let make = () => {\n" + getTabSpaces(level + 1);
     const content = buildViewTagsFromTree(buildTree, (level + 2));
-    const suffix = "\n}"
-    return prefix + content + suffix;
+    // const suffix = "\n}"
+    // return prefix + content + suffix;
+    return content;
 }
 
 function buildViewTagsFromTree(buildTree: RescriptBuildTree, level: number): string {
-    console.log("buildTree", Object.assign({}, buildTree))
-    const prefix = OPEN_TAG + buildTree.type + " " + getPropsCode(buildTree.props, buildTree.type, level + 1) + CLOSE_TAG;
+    const prefix = OPEN_TAG + buildTree.type + " " + NEW_LINE + getPropsCode(buildTree.props, buildTree.type, level + 1) + CLOSE_TAG;
     if (buildTree.childrens.length == 0) {
-        return prefix + OPEN_CLOSE_TAG + buildTree.type + CLOSE_TAG;
+        return prefix + OPEN_CLOSE_TAG + buildTree.type + getTabSpaces(level) + CLOSE_TAG;
     }
     let children = "";
     for (let i = 0; i < buildTree.childrens.length; i++) {
-        console.log("buildTree.childrens i", i, buildTree.childrens[i])
         if (typeof buildTree.childrens[i] === "string") {
-            children = children + NEW_LINE + buildTree.childrens[i] + NEW_LINE
+            children = children + NEW_LINE + getTabSpaces(level + 1) + buildTree.childrens[i] + NEW_LINE
         } else {
             children = children + buildViewTagsFromTree(buildTree.childrens[i] as RescriptBuildTree, level++)
         }
     }
-    return prefix + children + OPEN_CLOSE_TAG + buildTree.type + CLOSE_TAG;
+    return prefix + children + NEW_LINE + getTabSpaces(level) + OPEN_CLOSE_TAG + buildTree.type + CLOSE_TAG;
 }
 
 function getTabSpaces(level: number): string {
-    if (level <= 0) return ""
-    return "    ".concat(getTabSpaces(--level));
+    if (level <= 0) return DEFAULT_SPACES + " "
+    return DEFAULT_SPACES + " " + getTabSpaces(--level);
 }
 function getPropsCode(props: DomProps, type: string, level: number): string {
-    const layoutProps = propsToString(uniqByKeepFirst(props.props, it => it.key), level);
+    const layoutProps = propsToString(uniqByKeepLast(props.props, it => it.key), level);
     if (type == "Svg.SvgXml") {
         return layoutProps;
     } else {
-        const styleProps = styleToCode(uniqByKeepFirst(props.styles, it => it.key), level);
-        const textStyle = textStyleToString(uniqByKeepFirst(props.textStyle, it => it.key), level);
-        const finalStyleProps = "style={array([" + styleProps + (textStyle == "" ? "" : ",") + textStyle + "])}"
+        const styleProps = styleToCode(uniqByKeepLast(props.styles, it => it.key), level);
+        const textStyle = textStyleToString(uniqByKeepLast(props.textStyle, it => it.key), level);
+        const finalStyleProps = getTabSpaces(level) + "style={array([" + NEW_LINE + getTabSpaces(level + 1) + styleProps + (textStyle == "" ? "" : ",") + textStyle + getTabSpaces(level + 1) + "\n ])}"
         return layoutProps.concat(layoutProps == "" ? finalStyleProps : " ".concat(finalStyleProps));
     }
 }
@@ -97,14 +96,7 @@ function styleToCode(props: Props[], level: number) {
     return result;
 }
 
-const OPEN_TAG = "<"
-const TIDLE = "~"
-const CLOSE_TAG = ">"
-const EQUALS = "="
-const OPEN_CLOSE_TAG = "</"
-const NEW_LINE = "\n"
-
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function uniqByKeepFirst(a: Props[], key: (arg: Props) => string) {
     const seen = new Set();
     return a.filter((item:Props) => {
@@ -112,3 +104,19 @@ function uniqByKeepFirst(a: Props[], key: (arg: Props) => string) {
         return seen.has(k) ? false : seen.add(k);
     });
 }
+
+function uniqByKeepLast(a: Props[], key: (arg: Props) => string) {
+    return [
+        ...new Map(
+            a.map(x => [key(x), x])
+        ).values()
+    ]
+}
+
+const OPEN_TAG = "<"
+const TIDLE = "~"
+const CLOSE_TAG = ">"
+const EQUALS = "="
+const OPEN_CLOSE_TAG = "</"
+const NEW_LINE = "\n"
+const DEFAULT_SPACES = ""

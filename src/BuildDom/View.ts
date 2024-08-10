@@ -1,4 +1,5 @@
 import { handleFills, handleStroke, handleStrokeWeight } from "./Background";
+import { handleLayout } from "./Layout";
 import { RescriptBuildTree } from "./Types";
 
 
@@ -60,9 +61,7 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
                 handleStroke(element,resultDom) 
             });
         }
-        if (typeof frameNode.strokeWeight === "number") {
-            handleStrokeWeight(frameNode,resultDom)
-        }
+        handleStrokeWeight(frameNode,resultDom);
         if (typeof frameNode.cornerRadius === "number") {
             resultDom.props.styles.push({
                 key: "borderRadius",
@@ -78,12 +77,21 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
         }
     }
 
-    if (shouldSetFlex && resultDom.parent) {
-        resultDom.parent.props.styles.push({
+    if (resultDom.kind != "Child" && shouldSetFlex && resultDom.parent) {
+        resultDom.parent?.props.styles.push({
             key: "flex",
             value: "1.0"
         })
     }
+    handleLayout(figmaDom,resultDom)
+    const obj = resultDom.props.styles.find(o => o.key === 'borderColor');
+    if (!obj) {
+        resultDom.props.styles.push({
+            key: "borderColor",
+            value: JSON.stringify("#ffffff00")
+        })
+    }
+
 }
 
 const getFlexDirection = {
