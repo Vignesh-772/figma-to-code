@@ -12,6 +12,8 @@ import { RescriptBuildTree } from "./BuildDom/Types";
 // This shows the HTML page in "ui.html".
 figma.showUI(__html__);
 
+export const globalCache:{parentNode: {height : number, width: number}| null} = {parentNode:null}
+
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
@@ -19,8 +21,6 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
   // One way of distinguishing between different types of messages sent from
   // your HTML page is to use an object with a "type" property like this.
   if (msg.type === 'generate-code') {
-    console.log("generate-code")
-    console.log(figma.currentPage.selection)
     const rescriptNode:RescriptBuildTree = {
       type: "View",
       props: {
@@ -29,7 +29,8 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
         styles: []
       },
       childrens: [],
-      parent: undefined
+      parent: undefined,
+      kind: "Node"
     }
     await buildRescript(figma.currentPage.selection,rescriptNode)
     // figma.closePlugin();

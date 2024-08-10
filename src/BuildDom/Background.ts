@@ -7,32 +7,38 @@ export const handleFills = function(fills: Paint, self: SceneNode, rescriptDom: 
     const backgroundProps: Props[] = [];
     switch (fills.type) {
         case "SOLID": {
-            backgroundProps.push({
-                key: "backgroundColor",
-                value: JSON.stringify(RGBtoHexString(fills.color))
-            }); break;
+            const prop = {
+                key: rescriptDom.type == "Text" ? "color" : "backgroundColor",
+                value: JSON.stringify(RGBtoHexString(fills.color,fills.opacity))
+            }; 
+            if(rescriptDom.type == "Text") {
+                rescriptDom.props.textStyle.push(prop)
+            } else {
+                rescriptDom.props.styles.push(prop)
+            }
+            break;
         }
         case "GRADIENT_LINEAR": {
             handleSvg(self, rescriptDom)
             break;
         }
-        case "GRADIENT_RADIAL": { handleSvg(self, rescriptDom) } break;
+        case "GRADIENT_RADIAL": { handleSvg(self, rescriptDom);  break; }
         case "GRADIENT_ANGULAR": { handleSvg(self, rescriptDom); break; }
         case "GRADIENT_DIAMOND": { handleSvg(self, rescriptDom); break; }
         case "IMAGE":{ handleSvg(self, rescriptDom); break; }
         case "VIDEO": break;
     }
-    if (fills.opacity) {
-        backgroundProps.push({
-            key: "opacity",
-            value: fills.opacity.toFixed(1)
-        })
-    }
+    // if (fills.opacity) {
+    //     backgroundProps.push({
+    //         key: "opacity",
+    //         value: fills.opacity.toFixed(1)
+    //     })
+    // }
     backgroundProps.forEach((element) => {rescriptDom.props.styles.push(element)});
 }
 
-function RGBtoHexString(color: RGB) {
-    return "#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b);
+function RGBtoHexString(color: RGB, alpha:number | undefined) {
+    return "#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b) + (alpha ? componentToHex(alpha!) : "");
 }
 
 function componentToHex(c: number) {
@@ -61,12 +67,12 @@ async function handleSvg(self: SceneNode, rescriptDom: RescriptBuildTree) {
     const callback = clonedSelf.exportAsync(settings);
     await callback.then((onfulfilled) => {
         if (onfulfilled) {
-            rescriptDom.childrens.unshift(createSVGWithString(onfulfilled, self, rescriptDom))
+            createSVGWithString(onfulfilled, self, rescriptDom)
             clonedSelf.remove()
         } else {
             figma.notify("SVG Creation Failed")
         }
-    })
+    }).catch((err) => console.log("handleSvg ->", clonedSelf, err))
 }
 
 
@@ -76,7 +82,7 @@ export const handleStroke = function(fills: Paint, rescriptDom: RescriptBuildTre
         case "SOLID": {
             backgroundProps.push({
                 key: "borderColor",
-                value: RGBtoHexString(fills.color)
+                value: RGBtoHexString(fills.color,fills.opacity)
             }); break;
         }
         default: figma.notify(fills.type + " not Supported for Stroke"); break;

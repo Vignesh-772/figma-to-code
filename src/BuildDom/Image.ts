@@ -5,9 +5,9 @@ export function isImageNode(node: SceneNode): boolean {
     if ('children' in node && node.children.length > 0) {
       let hasOnlyVector = true
       node.children.forEach((child) => {
-        if (child.type !== 'VECTOR') {
+        if (child.type !== 'VECTOR'  && child.type !== 'RECTANGLE' && child.type !== 'LINE'  && child.type !== 'ELLIPSE'  && child.type !== 'POLYGON' && child.type !== 'STAR' && child.type !== 'BOOLEAN_OPERATION') {
           hasOnlyVector = false
-        }
+        } 
       })
       if (hasOnlyVector) {
         return true
@@ -30,9 +30,9 @@ export async function getImageNode (dom: SceneNode, rescriptBuildTree: RescriptB
     const callback = dom.exportAsync(settings);
     await callback.then((onfulfilled) => {
         if (onfulfilled) {
-            rescriptBuildTree.childrens.unshift(createSVGWithString(onfulfilled, dom, rescriptBuildTree))
+          createSVGWithString(onfulfilled, dom, rescriptBuildTree)
         } else {
             figma.notify("SVG Creation Failed")
         }
-    })
+    }).catch((err) => console.log("getImageNode ->", dom, err))
 }

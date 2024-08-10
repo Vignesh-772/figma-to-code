@@ -138,7 +138,7 @@ const textAlignHorizontal = {
 
 const textAlignVertical = {
     TOP: '#top',
-    CENTER: '#center',
+    CENTER: '#auto',
     BOTTOM: '#bottom'
 }
 const textCase = {
