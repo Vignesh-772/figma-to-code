@@ -97,10 +97,10 @@ function getTextProps(dom: SceneNode) {
 
         }
         if (textNode.lineHeight) {
-            if (textNode.lineHeight as LetterSpacing) {
+            if ((Object.prototype.hasOwnProperty.call(textNode.lineHeight,"value") && textNode.lineHeight as LetterSpacing)) {
                 props.textStyle.push({
                     key: 'lineHeight',
-                    value: ((textNode.lineHeight as LetterSpacing).value).toFixed(1)
+                    value: (textNode.lineHeight as LetterSpacing).value.toFixed(1)
                 })
             }
 
