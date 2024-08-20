@@ -34,7 +34,12 @@ module.exports = (env, argv) => ({
       },
 
       // Allows you to use "<%= require('./file.svg') %>" in your HTML code to get a data URI
-      { test: /\.(png|jpg|gif|webp|svg)$/, loader: 'url-loader' }
+      { test: /\.(png|jpg|gif|webp|svg)$/, loader: 'url-loader' },
+      {    
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        loader: "file-loader"
+      }
+    
     ]
   },
 
