@@ -1,8 +1,8 @@
-import { DomProps, Props, RescriptBuildTree } from "../BuildDom/Types";
+import { DomProps, Props, RescriptOutputTree } from "../BuildDom/Types";
 
 
 
-export function buildReactFromBuildTree(buildTree: RescriptBuildTree, level: number): string {
+export function buildReactFromOutputTree(buildTree: RescriptOutputTree, level: number): string {
     // const prefix = "let make = () => {\n" + getTabSpaces(level + 1);
     const content = buildViewTagsFromTree(buildTree, (level + 2));
     // const suffix = "\n}"
@@ -10,7 +10,7 @@ export function buildReactFromBuildTree(buildTree: RescriptBuildTree, level: num
     return content;
 }
 
-function buildViewTagsFromTree(buildTree: RescriptBuildTree, level: number): string {
+function buildViewTagsFromTree(buildTree: RescriptOutputTree, level: number): string {
     const prefix = OPEN_TAG + buildTree.type + " " + NEW_LINE + getPropsCode(buildTree.props, buildTree.type, level + 1) + CLOSE_TAG;
     if (buildTree.childrens.length == 0) {
         return prefix + OPEN_CLOSE_TAG + buildTree.type + getTabSpaces(level) + CLOSE_TAG;
@@ -20,7 +20,7 @@ function buildViewTagsFromTree(buildTree: RescriptBuildTree, level: number): str
         if (typeof buildTree.childrens[i] === "string") {
             children = children + NEW_LINE + getTabSpaces(level + 1) + buildTree.childrens[i] + NEW_LINE
         } else {
-            children = children + buildViewTagsFromTree(buildTree.childrens[i] as RescriptBuildTree, level++)
+            children = children + buildViewTagsFromTree(buildTree.childrens[i] as RescriptOutputTree, level++)
         }
     }
     return prefix + children + NEW_LINE + getTabSpaces(level) + OPEN_CLOSE_TAG + buildTree.type + CLOSE_TAG;

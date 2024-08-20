@@ -10,7 +10,7 @@ import { RescriptBuildTree } from "./BuildDom/Types";
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
 
 // This shows the HTML page in "ui.html".
-figma.showUI(__html__);
+figma.showUI(__html__, { width: 520, height: 520 })
 
 export const globalCache:{parentNode: {height : number, width: number}| null} = {parentNode:null}
 
@@ -30,6 +30,7 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
       },
       childrens: [],
       parent: undefined,
+      id : "root",
       kind: "Node"
     }
     await buildRescript(figma.currentPage.selection,rescriptNode)
@@ -37,5 +38,7 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
     // buildRescript()
   } else if (msg.type === 'close') {
     figma.closePlugin();
+  } else if (msg.type === 'notify-copy') {
+    figma.notify("Copied")
   }
 };

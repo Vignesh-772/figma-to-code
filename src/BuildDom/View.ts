@@ -69,23 +69,28 @@ function getViewProps(figmaDom: SceneNode,resultDom: RescriptBuildTree) {
             })
         }
         if(frameNode.layoutMode && frameNode.layoutMode != "NONE"){
-            shouldSetFlex = true;
+            // shouldSetFlex = true;
             resultDom.props.styles.push({
                 key: "flexDirection",
                 value: getFlexDirection[frameNode.layoutMode]
             })
+        } else {
+            resultDom.props.styles.push({
+                key: "flexDirection",
+                value: "#row"
+            })
         }
     }
 
-    if (resultDom.kind != "Child" && shouldSetFlex && resultDom.parent) {
-        resultDom.parent?.props.styles.push({
-            key: "flex",
-            value: "1.0"
-        })
-    }
+    // if (resultDom.kind != "Child" && shouldSetFlex && resultDom.parent) {
+    //     resultDom.parent?.props.styles.push({
+    //         key: "flex",
+    //         value: "1.0"
+    //     })
+    // }
     handleLayout(figmaDom,resultDom)
-    const obj = resultDom.props.styles.find(o => o.key === 'borderColor');
-    if (!obj) {
+    const obj = resultDom.props.styles.filter(o => o.key == "borderColor");
+    if (obj.length == 0) {
         resultDom.props.styles.push({
             key: "borderColor",
             value: JSON.stringify("#ffffff00")

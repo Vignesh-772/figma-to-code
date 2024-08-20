@@ -15,4 +15,20 @@ export type RescriptBuildTree = {
     , childrens: Array<RescriptBuildTree | string>
     , parent: RescriptBuildTree | undefined
     , kind: 'Node' | 'Child'
+    , id : string
+}
+
+export type RescriptOutputTree = {
+    "type": string
+    , props: DomProps
+    , childrens: Array<RescriptOutputTree | string>
+    , id : string
+}
+
+export type TextNodeProps = {
+    "type": string
+    , props: DomProps
+    , childrens: string
+    , id : string
+    , isConstant: boolean
 }

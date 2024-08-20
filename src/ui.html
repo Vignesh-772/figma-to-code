@@ -1,40 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=New+Amsterdam&display=swap"
+    rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="style-sheet" href="./ui.css"/>
   <title>Document</title>
+
 </head>
+
 <body>
-  <h2>Rescript Code Generator</h2>
-<button id="generate">Generate</button>
-<button id="close">Close</button>
-<p id="code_interface"></p>
-
-
-</div>
-<script>
-
-onmessage = ((data)=>{ 
-  const area = document.createElement('textarea')
-  document.body.appendChild(area)
-  area.value = data.data.pluginMessage.data
-  area.focus()
-  area.select()
-  const result = document.execCommand('copy')
-  document.body.removeChild(area)
-  document.execCommand('copy')
-})
-
-document.getElementById('generate').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'generate-code'} }, '*')
-}
-
-document.getElementById('close').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'close' } }, '*')
-}
-
-</script>
+  <div id="app"></div>
 </body>
+
 </html>

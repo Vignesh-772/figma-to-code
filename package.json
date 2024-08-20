@@ -14,9 +14,13 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@vanilla-extract/css": "^1.0.0",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "webpack": "^4.41.4",
     "webpack-cli": "^3.3.6"
   },
@@ -29,13 +33,14 @@
     "eslint": "^8.54.0",
     "eslint-config-prettier": "8.1.0",
     "figma-api-stub": "0.0.48",
+    "file-loader": "^6.2.0",
     "jest": "27.0.6",
-    "undici-types": "^6.19.2",
     "prettier": "2.2.1",
     "style-loader": "2.0.0",
     "ts-loader": "8.0.17",
     "ts-node": "9.1.1",
     "typescript": "5.4.2",
+    "undici-types": "^6.19.2",
     "url-loader": "4.1.1"
   },
   "eslintConfig": {
