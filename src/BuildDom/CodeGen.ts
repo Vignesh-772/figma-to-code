@@ -1,14 +1,11 @@
 import { getImageNode, isImageNode } from "./Image"
-import { fetchParentNode } from "./Layout";
 import getTextProps from "./Text"
 import { RescriptBuildTree, RescriptOutputTree } from "./Types"
-import { mapNumRange } from "./Utils";
 import getViewProps from "./View"
 
 async function buildRescript(figmaNode: ReadonlyArray<SceneNode>, rescriptBuildTree: RescriptBuildTree) {
     for (let i = 0; i < figmaNode.length; i++) {
         const currentTree = Object.assign({}, rescriptBuildTree);
-        console.log(currentTree)
         await generateCode(figmaNode.at(i)!, currentTree, 0).then(() => {
             figma.ui.postMessage({ status: "success", data: JSON.stringify(convertToOutputTree(currentTree)) })
         })
@@ -72,7 +69,6 @@ function handleFlex(dom: SceneNode, currentDom: RescriptBuildTree) {
         // })
         // const maxFlex = ratios.length
         // const maxRatio = ratios.reduce((partialSum, a) => partialSum + a, 0);
-        // console.log("ratios", ratios)
         // currentDom.childrens.forEach((ele, index) => {
         //     if (typeof ele !== "string") {
         //         ele.props.styles.push({

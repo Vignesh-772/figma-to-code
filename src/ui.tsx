@@ -50,7 +50,6 @@ function App() {
   }
 
   function triggerCopy(textNodes:Array<TextNodeProps> | undefined) {
-    console.log("jellp")
     if (finalOut.current) {
       // text.forEach(ele => )
 
