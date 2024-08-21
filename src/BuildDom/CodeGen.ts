@@ -6,9 +6,9 @@ import getViewProps from "./View"
 async function buildRescript(figmaNode: ReadonlyArray<SceneNode>, rescriptBuildTree: RescriptBuildTree) {
     for (let i = 0; i < figmaNode.length; i++) {
         const currentTree = Object.assign({}, rescriptBuildTree);
-        await generateCode(figmaNode.at(i)!, currentTree, 0).then(() => {
+        generateCode(figmaNode[i], currentTree, 0).then(() => {
             figma.ui.postMessage({ status: "success", data: JSON.stringify(convertToOutputTree(currentTree)) })
-        })
+        }).catch((err) => {console.error("err" , err)})
     }
 }
 
@@ -34,7 +34,10 @@ async function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree, inde
         if (currentDom.type != "Svg.SvgXml" && (dom as ChildrenMixin).children) {
             const children = (dom as ChildrenMixin).children;
             for (let i = 0; i < children.length; i++) {
-                await generateCode(children.at(i)!, currentDom, i);
+                await generateCode(children[i], currentDom, i).then(() => {
+                }).catch((err) => {
+                    console.log("error generateCode ->", err)
+                })
             }
         }
         handleFlex(dom, currentDom)
@@ -45,6 +48,8 @@ async function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree, inde
         if (rescriptDom.type != "Svg.SvgXml") {
             rescriptDom.childrens.splice(index, 0, currentDom);
         }
+    }).catch((err) => {
+        console.error("Err in buildNodeOrLeaf", err)
     })
 }
 
@@ -69,6 +74,7 @@ function handleFlex(dom: SceneNode, currentDom: RescriptBuildTree) {
         // })
         // const maxFlex = ratios.length
         // const maxRatio = ratios.reduce((partialSum, a) => partialSum + a, 0);
+        // console.log("ratios", ratios)
         // currentDom.childrens.forEach((ele, index) => {
         //     if (typeof ele !== "string") {
         //         ele.props.styles.push({
@@ -158,7 +164,10 @@ async function buildNodeOrLeaf(dom: SceneNode, rescriptDom: RescriptBuildTree) {
         currentDom.props = getTextProps(dom)
         currentDom.childrens.push((dom as TextNode).characters)
     } else if (currentDom.type == "Svg.SvgXml") {
-        await getImageNode(dom, currentDom)
+        await getImageNode(dom, currentDom).then(() => {
+        }).catch((err) => {
+            console.log("getImageNode err", err)
+        })
     }
     getViewProps(dom, currentDom)
     if (type == "Text" && currentDom.parent) {

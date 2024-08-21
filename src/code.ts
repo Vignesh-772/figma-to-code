@@ -33,9 +33,7 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
       id : "root",
       kind: "Node"
     }
-    await buildRescript(figma.currentPage.selection,rescriptNode)
-    // figma.closePlugin();
-    // buildRescript()
+    buildRescript(figma.currentPage.selection,rescriptNode)
   } else if (msg.type === 'close') {
     figma.closePlugin();
   } else if (msg.type === 'notify-copy') {
