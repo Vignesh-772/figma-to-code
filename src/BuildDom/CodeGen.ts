@@ -1,18 +1,30 @@
-import { getImageNode, isImageNode } from "./Image"
-import getTextProps from "./Text"
-import { RescriptBuildTree, RescriptOutputTree } from "./Types"
-import getViewProps from "./View"
+import { getImageNode, isImageNode } from "./Rescript/Image"
+import getTextProps from "./Rescript/Text"
+import { DomTree, Language, OutputTree } from "./Types"
+import getViewProps from "./Rescript/View"
+import { RescriptBuilder } from "./Rescript/RescriptBuilder";
+import { Builder } from "./Builder";
 
-async function buildRescript(figmaNode: ReadonlyArray<SceneNode>, rescriptBuildTree: RescriptBuildTree) {
+export async function buildDomTree(figmaNode: ReadonlyArray<SceneNode>, lang: Language) {
+    const builder = getBuilderInstanceByLanguage(lang) ;
     for (let i = 0; i < figmaNode.length; i++) {
-        const currentTree = Object.assign({}, rescriptBuildTree);
-        generateCode(figmaNode[i], currentTree, 0).then(() => {
+        const currentTree = Object.assign({}, builder.getNode("View", undefined,"root"));
+        generateCode(builder,figmaNode[i], currentTree, 0).then(() => {
+            console.log("Rescript ->", figmaNode[i])
             figma.ui.postMessage({ status: "success", data: JSON.stringify(convertToOutputTree(currentTree)) })
         }).catch((err) => {console.error("err" , err)})
     }
 }
 
-function convertToOutputTree(rescriptBuildTree: RescriptBuildTree): RescriptOutputTree {
+function getBuilderInstanceByLanguage(lang: Language):Builder {
+    switch (lang) {
+        case Language.Rescript: return new RescriptBuilder(); 
+        case Language.TypeScript: return new RescriptBuilder(); 
+        case Language.Javascript: return new RescriptBuilder();
+    }
+  }
+
+function convertToOutputTree(rescriptBuildTree: DomTree): OutputTree {
     return {
         type: rescriptBuildTree.type,
         id: rescriptBuildTree.id,
@@ -29,18 +41,18 @@ function convertToOutputTree(rescriptBuildTree: RescriptBuildTree): RescriptOutp
 }
 
 
-async function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree, index: number) {
-    await buildNodeOrLeaf(dom, rescriptDom).then(async (currentDom) => {
+async function generateCode(builder:Builder,dom: SceneNode, rescriptDom: DomTree, index: number) {
+    await buildNodeOrLeaf(builder,dom, rescriptDom).then(async (currentDom) => {
         if (currentDom.type != "Svg.SvgXml" && (dom as ChildrenMixin).children) {
             const children = (dom as ChildrenMixin).children;
             for (let i = 0; i < children.length; i++) {
-                await generateCode(children[i], currentDom, i).then(() => {
+                await generateCode(builder,children[i], currentDom, i).then(() => {
                 }).catch((err) => {
                     console.log("error generateCode ->", err)
                 })
             }
         }
-        handleFlex(dom, currentDom)
+        handleFlex(builder,dom, currentDom)
         const wrapEle = currentDom.props.styles.filter(a => a.key == "flexDirection")
         if (wrapEle.length > 0 && wrapEle[0].value == "#column") {
             currentDom.props.styles = currentDom.props.styles.filter(a => a.key != "flexWrap")
@@ -53,36 +65,9 @@ async function generateCode(dom: SceneNode, rescriptDom: RescriptBuildTree, inde
     })
 }
 
-function handleFlex(dom: SceneNode, currentDom: RescriptBuildTree) {
+function handleFlex(builder:Builder, dom: SceneNode, currentDom: DomTree) {
     const gapEle = currentDom.props.styles.filter(a => a.key == "gap")
     if (gapEle.length > 0) {
-        // let gap = 0.0
-        // if (typeof gapEle[0].value === "string") {
-        //     gap = parseFloat(gapEle[0].value)
-        // }
-        // const ratios: number[] = [];
-        // const parentNode = fetchParentNode(dom);
-        // const childrenMixin = dom as ChildrenMixin
-        // childrenMixin.children.forEach((ele) => {
-        //     if (typeof ele !== "string") {
-        //         const node = ele
-        //         if (node && parentNode) {
-        //             const dimensionAndPositionMixin = node as DimensionAndPositionMixin
-        //             ratios.push((dimensionAndPositionMixin.width / parentNode.width) * 100)
-        //         }
-        //     }
-        // })
-        // const maxFlex = ratios.length
-        // const maxRatio = ratios.reduce((partialSum, a) => partialSum + a, 0);
-        // console.log("ratios", ratios)
-        // currentDom.childrens.forEach((ele, index) => {
-        //     if (typeof ele !== "string") {
-        //         ele.props.styles.push({
-        //             key: "flex",
-        //             value: mapNumRange(ratios[index], 0.0, maxRatio, 0.0, maxFlex).toFixed(1)
-        //         })
-        //     }
-        // })
         const gapEle = currentDom.props.styles.filter(a => a.key == "gap")
         if (gapEle.length > 0) {
             let gap = 0.0
@@ -93,13 +78,11 @@ function handleFlex(dom: SceneNode, currentDom: RescriptBuildTree) {
             if (a > dom.width / 2) {
                 currentDom.childrens.forEach((ele, index) => {
                     if (typeof ele !== "string" && index < currentDom.childrens.length - 1) {
-                        ele.props.styles.push({
-                            key: "flex",
-                            value: "1.0"
-                        })
+                        ele.props.styles.push(builder.buildProp({key: "flex",value: "1.0"}))
                     }
                 })
-                // const newChild: Array<RescriptBuildTree | string> = []
+                
+                // const newChild: Array<DomTree | string> = []
                 // currentDom.childrens = currentDom.childrens.reduce((acc, curr, index) => {
                 //     acc.push(curr);
                 //     if (index < currentDom.childrens.length - 1) {
@@ -112,64 +95,25 @@ function handleFlex(dom: SceneNode, currentDom: RescriptBuildTree) {
     }
 }
 
-const flexElem = (rescriptDom: RescriptBuildTree): RescriptBuildTree => {
-    return {
-        type: "View",
-        props: {
-            props: [],
-            textStyle: [],
-            styles: [{
-                key: "flex",
-                value: "1.0"
-            }]
-        },
-        childrens: [],
-        parent: rescriptDom,
-        id: rescriptDom.id + "_flexElem",
-        kind: 'Node'
-    };
-}
 
-
-async function buildNodeOrLeaf(dom: SceneNode, rescriptDom: RescriptBuildTree) {
+async function buildNodeOrLeaf(builder:Builder, dom: SceneNode, rescriptDom: DomTree) {
     const type = getRescriptType(dom.type, dom);
-    let currentDom: RescriptBuildTree = {
-        type: type,
-        props: {
-            props: [],
-            textStyle: [],
-            styles: []
-        },
-        childrens: [],
-        parent: rescriptDom,
-        id: dom.id,
-        kind: type == "View" ? "Node" : "Child"
-    }
+    let currentDom: DomTree = type == "View" ? builder.getNode(type,rescriptDom,dom.id) : builder.getChild(type,rescriptDom,dom.id)
     if (type == "Text") {
-        const parentDom: RescriptBuildTree = {
-            type: "View",
-            props: {
-                props: [],
-                textStyle: [],
-                styles: []
-            },
-            childrens: [currentDom],
-            parent: rescriptDom,
-            id: dom.id + "_parent",
-            kind: "Node"
-        }
+        const parentDom: DomTree = builder.getNode("View",rescriptDom,dom.id + "_parent")
+        parentDom.childrens.push(currentDom)
         currentDom.parent = parentDom
     }
     if (currentDom.type == "Text") {
-        currentDom.props = getTextProps(dom)
+        currentDom.props = getTextProps(builder,dom)
         currentDom.childrens.push((dom as TextNode).characters)
     } else if (currentDom.type == "Svg.SvgXml") {
-        await getImageNode(dom, currentDom).then(() => {
+        await getImageNode(builder,dom, currentDom).then(() => {
         }).catch((err) => {
             console.log("getImageNode err", err)
         })
     }
-    getViewProps(dom, currentDom)
+    getViewProps(builder,dom, currentDom)
     if (type == "Text" && currentDom.parent) {
         currentDom = currentDom.parent;
     }
@@ -182,6 +126,3 @@ function getRescriptType(type: string, dom: SceneNode) {
         default: return isImageNode(dom) ? "Svg.SvgXml" : "View"
     }
 }
-
-
-export default buildRescript;

@@ -1,6 +1,8 @@
 export type Props = {
     key: string,
     value: string | number
+    unit: string,
+    prefix: string
 }
 
 export type DomProps = {
@@ -9,26 +11,33 @@ export type DomProps = {
     styles: Array<Props>
 }
 
-export type RescriptBuildTree = {
+export type DomTree = {
     "type": string
     , props: DomProps
-    , childrens: Array<RescriptBuildTree | string>
-    , parent: RescriptBuildTree | undefined
+    , childrens: Array<DomTree | string>
+    , parent: DomTree | undefined
     , kind: 'Node' | 'Child'
-    , id : string
+    , id: string
 }
 
-export type RescriptOutputTree = {
+export type OutputTree = {
     "type": string
     , props: DomProps
-    , childrens: Array<RescriptOutputTree | string>
-    , id : string
+    , childrens: Array<OutputTree | string>
+    , id: string
 }
 
 export type TextNodeProps = {
     "type": string
     , props: DomProps
     , childrens: string
-    , id : string
+    , id: string
     , isConstant: boolean
 }
+
+export enum Language {
+    Rescript
+    , TypeScript
+    , Javascript
+}
+

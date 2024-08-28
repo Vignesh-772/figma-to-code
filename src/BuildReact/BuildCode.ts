@@ -1,16 +1,13 @@
-import { DomProps, Props, RescriptOutputTree } from "../BuildDom/Types";
+import { DomProps, Props, OutputTree } from "../BuildDom/Types";
 
 
 
-export function buildReactFromOutputTree(buildTree: RescriptOutputTree, level: number): string {
-    // const prefix = "let make = () => {\n" + getTabSpaces(level + 1);
+export function buildReactFromOutputTree(buildTree: OutputTree, level: number): string {
     const content = buildViewTagsFromTree(buildTree, (level + 2));
-    // const suffix = "\n}"
-    // return prefix + content + suffix;
     return content;
 }
 
-function buildViewTagsFromTree(buildTree: RescriptOutputTree, level: number): string {
+function buildViewTagsFromTree(buildTree: OutputTree, level: number): string {
     const prefix = OPEN_TAG + buildTree.type + " " + NEW_LINE + getPropsCode(buildTree.props, buildTree.type, level + 1) + CLOSE_TAG;
     if (buildTree.childrens.length == 0) {
         return prefix + OPEN_CLOSE_TAG + buildTree.type + getTabSpaces(level) + CLOSE_TAG;
@@ -20,7 +17,7 @@ function buildViewTagsFromTree(buildTree: RescriptOutputTree, level: number): st
         if (typeof buildTree.childrens[i] === "string") {
             children = children + NEW_LINE + getTabSpaces(level + 1) + buildTree.childrens[i] + NEW_LINE
         } else {
-            children = children + buildViewTagsFromTree(buildTree.childrens[i] as RescriptOutputTree, level++)
+            children = children + buildViewTagsFromTree(buildTree.childrens[i] as OutputTree, level++)
         }
     }
     return prefix + children + NEW_LINE + getTabSpaces(level) + OPEN_CLOSE_TAG + buildTree.type + CLOSE_TAG;
@@ -52,6 +49,7 @@ function propsToString(props: Props[], level: number) {
         result += EQUALS
         result += " "
         result += props[i].value
+        result += props[i].unit
         result += " "
         result += NEW_LINE
     }
@@ -63,12 +61,13 @@ function textStyleToString(props: Props[], level: number) {
     let result: string = "textStyle(";
     for (let i = 0; i < props.length; i++) {
         result += getTabSpaces(level)
-        result += TIDLE
+        result += props[i].prefix
         result += props[i].key
         result += " "
         result += EQUALS
         result += " "
         result += props[i].value
+        result += props[i].unit
         result += ","
         result += " "
         result += NEW_LINE
@@ -82,12 +81,13 @@ function styleToCode(props: Props[], level: number) {
     let result: string = "viewStyle(";
     for (let i = 0; i < props.length; i++) {
         result += getTabSpaces(level)
-        result += TIDLE
+        result += props[i].prefix
         result += props[i].key
         result += " "
         result += EQUALS
         result += " "
         result += props[i].value
+        result += props[i].unit
         result += ","
         result += " "
         result += NEW_LINE
@@ -114,7 +114,6 @@ function uniqByKeepLast(a: Props[], key: (arg: Props) => string) {
 }
 
 const OPEN_TAG = "<"
-const TIDLE = "~"
 const CLOSE_TAG = ">"
 const EQUALS = "="
 const OPEN_CLOSE_TAG = "</"
