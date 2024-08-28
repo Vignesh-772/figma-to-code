@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import * as React from 'react'
 import ReactDOMClient from 'react-dom/client';
-import { RescriptOutputTree, TextNodeProps } from './BuildDom/Types';
+import { OutputTree, TextNodeProps } from './BuildDom/Types';
 import { buildReactFromOutputTree } from './BuildReact/BuildCode';
 import styles from './ui.css'
 
@@ -97,7 +97,7 @@ function App() {
 }
 
 
-function getTextNodes(out: RescriptOutputTree, textNodes: Array<TextNodeProps>) {
+function getTextNodes(out: OutputTree, textNodes: Array<TextNodeProps>) {
   if (out.type == "Text") {
     textNodes.push(getTextNodeProps(out))
   }
@@ -108,7 +108,7 @@ function getTextNodes(out: RescriptOutputTree, textNodes: Array<TextNodeProps>) 
   })
 }
 
-function updateTextNodes(nodes: RescriptOutputTree, textNode: Array<TextNodeProps>) {
+function updateTextNodes(nodes: OutputTree, textNode: Array<TextNodeProps>) {
   if (textNode.length == 0) return;
   if (textNode.length > 1) {
     textNode.forEach(ele => updateTextNodes(nodes, [ele]))
@@ -120,7 +120,7 @@ function updateTextNodes(nodes: RescriptOutputTree, textNode: Array<TextNodeProp
   }
 }
 
-function findNodeById(id: string, outTree: RescriptOutputTree): RescriptOutputTree | undefined {
+function findNodeById(id: string, outTree: OutputTree): OutputTree | undefined {
   if (outTree.id == id) {
     return outTree;
   } else {
@@ -136,7 +136,7 @@ function findNodeById(id: string, outTree: RescriptOutputTree): RescriptOutputTr
   }
 }
 
-function getTextNodeProps(out: RescriptOutputTree): TextNodeProps {
+function getTextNodeProps(out: OutputTree): TextNodeProps {
   return {
     type: out.type,
     id: out.id,

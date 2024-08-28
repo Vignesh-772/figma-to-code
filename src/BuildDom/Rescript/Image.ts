@@ -1,5 +1,6 @@
 import createSVGWithString from "./Svg"
-import { RescriptBuildTree } from "./Types"
+import { DomTree } from "../Types"
+import { Builder } from "../Builder"
 
 export function isImageNode(node: SceneNode): boolean {
     if ('children' in node && node.children.length > 0) {
@@ -25,12 +26,12 @@ export function isImageNode(node: SceneNode): boolean {
   }
 
 
-export async function getImageNode (dom: SceneNode, rescriptBuildTree: RescriptBuildTree) {
+export async function getImageNode (builder :Builder, dom: SceneNode, rescriptBuildTree: DomTree) {
     const settings = { format: 'SVG_STRING' } as ExportSettingsSVGString;
     const callback = dom.exportAsync(settings);
     await callback.then((onfulfilled) => {
         if (onfulfilled) {
-          createSVGWithString(onfulfilled, dom, rescriptBuildTree)
+          createSVGWithString(builder,onfulfilled, dom, rescriptBuildTree)
         } else {
             figma.notify("SVG Creation Failed")
         }

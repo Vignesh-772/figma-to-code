@@ -1,22 +1,28 @@
-import { globalCache } from "../code";
-import { RescriptBuildTree } from "./Types";
+import { globalCache } from "../../code";
+import { Builder } from "../Builder";
+// import { buildProp } from "../Builder";
+import { DomTree } from "../Types";
 
-export const handleLayout = function (node: SceneNode, rescriptDom: RescriptBuildTree) {
+export const handleLayout = function (builder:Builder, node: SceneNode, rescriptDom: DomTree) {
     const autoLayout = node as AutoLayoutMixin;
     if (node as LayoutMixin) {
         const layout = node as LayoutMixin;
         if (rescriptDom.kind != "Child") {
             if (layout.height) {
-                rescriptDom.props.styles.push({
+                const isHeightMatch = isHeightMatchParent(node)
+                rescriptDom.props.styles.push(builder.buildProp({
                     key: "height",
-                    value: isHeightMatchParent(node) ? "100.0->pct" : layout.height.toFixed(1) + "->dp"
-                });
+                    value: isHeightMatch ? "100.0" : layout.width.toFixed(1), 
+                    unit: isHeightMatch ? "->pct" : "->dp"
+                }));
             }
             if (layout.width) {
-                rescriptDom.props.styles.push({
+                const isWidthMatch= isWidthMatchParent(node)
+                rescriptDom.props.styles.push(builder.buildProp({
                     key: "width",
-                    value: isWidthMatchParent(node) ? "100.0->pct" : layout.width.toFixed(1) + "->dp"
-                });
+                    value: isWidthMatch ? "100.0" : layout.width.toFixed(1), 
+                    unit: isWidthMatch ? "->pct" : "->dp"
+                }));
             }
         }
         if (isWidthWrapParent(node, rescriptDom.type)) {
@@ -41,48 +47,52 @@ export const handleLayout = function (node: SceneNode, rescriptDom: RescriptBuil
                 }
                 if ((!width || width != "100.0->pct") && autoLayout && (autoLayout as AutoLayoutMixin).layoutMode == "HORIZONTAL") {
                     if (rescriptDom.type == "Text" && rescriptDom.parent.parent) {
-                        rescriptDom.parent.parent.props.styles.push({
+                        rescriptDom.parent.parent.props.styles.push(builder.buildProp({
                             key: "flexWrap",
                             value: "#wrap"
-                        });
+                        }));
                     } else {
-                        rescriptDom.parent.props.styles.push({
+                        rescriptDom.parent.props.styles.push(builder.buildProp({
                             key: "flexWrap",
                             value: "#wrap"
-                        });
+                        }));
                     }
                 }
             }
         }
         if (layout.minHeight) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "minHeight",
-                value: layout.minHeight + "px"
-            });
+                value: layout.minHeight,
+                unit: "px"
+            }));
         }
         if (layout.maxHeight) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "maxHeight",
-                value: layout.maxHeight + "px"
-            });
+                value: layout.maxHeight,
+                unit: "px"
+            }));
         }
         if (layout.minWidth) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "minWidth",
-                value: layout.minWidth + "px"
-            });
+                value: layout.minWidth,
+                unit: "px"
+            }));
         }
         if (layout.maxWidth) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "maxWidth",
-                value: layout.maxWidth + "px"
-            });
+                value: layout.maxWidth,
+                unit: "px"
+            }));
         }
         if (layout.rotation) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "transform",
                 value: "{rotate: '" + layout.rotation + "deg'}"
-            });
+            }));
         }
         if (autoLayout.layoutMode == "HORIZONTAL" && rescriptDom.kind != "Child" && (layout.layoutSizingHorizontal || layout.layoutSizingVertical)) {
             const resultDom = rescriptDom;
@@ -91,15 +101,15 @@ export const handleLayout = function (node: SceneNode, rescriptDom: RescriptBuil
             //     resultDom = rescriptDom.parent
             // }
             if (layout.layoutSizingHorizontal == "HUG") {
-                resultDom.props.styles.push({
+                resultDom.props.styles.push(builder.buildProp({
                     key: "flexWrap",
                     value: "#wrap"
-                });
+                }));
             } else if (layout.layoutSizingHorizontal == "FILL") {
-                    rescriptDom.props.styles.push({
+                    rescriptDom.props.styles.push(builder.buildProp({
                         key: "flex",
                         value: "1.0"
-                    });
+                    }));
             }
         }
     }
@@ -107,27 +117,27 @@ export const handleLayout = function (node: SceneNode, rescriptDom: RescriptBuil
     if (rescriptDom.type == "Text" && node.parent && rescriptDom.parent) {
         const parent = node.parent as LayoutMixin;
         if (parent.layoutSizingHorizontal == "FILL") {
-            rescriptDom.parent.props.styles.push({
+            rescriptDom.parent.props.styles.push(builder.buildProp({
                 key: "flex",
                 value: "1.0"
-            });
+            }));
         }
     }
 
     if (node as AutoLayoutMixin) {
         if (autoLayout.primaryAxisAlignItems) {
             if (autoLayout.primaryAxisAlignItems) {
-                rescriptDom.props.styles.push({
+                rescriptDom.props.styles.push(builder.buildProp({
                     key: "alignItems",
                     value: alignItemsCounter[autoLayout.counterAxisAlignItems]
-                });
+                }));
             }
         } 
         if (autoLayout.counterAxisAlignContent) {
-                rescriptDom.props.styles.push({
+                rescriptDom.props.styles.push(builder.buildProp({
                     key: "justifyContent",
                     value: alignItemsPrimary[autoLayout.primaryAxisAlignItems]
-                });
+                }));
             }
             // if (autoLayout.primaryAxisAlignItems) {
             //     rescriptDom.props.styles.push({
@@ -165,10 +175,10 @@ export const handleLayout = function (node: SceneNode, rescriptDom: RescriptBuil
         // }
 
         if (autoLayout.itemSpacing) {
-            rescriptDom.props.styles.push({
+            rescriptDom.props.styles.push(builder.buildProp({
                 key: "gap",
                 value: autoLayout.itemSpacing.toFixed(1)
-            });
+            }));
         }
     }
 
@@ -246,10 +256,10 @@ const alignItemsCounter = {
 }
 
 
-const alignContentCounter = {
-    'AUTO': '#center',
-    'SPACE_BETWEEN': '#space-between'
-}
+// const alignContentCounter = {
+//     'AUTO': '#center',
+//     'SPACE_BETWEEN': '#space-between'
+// }
 
 const alignItemsPrimary = {
     // eslint-disable-next-line no-useless-escape
@@ -270,7 +280,7 @@ const alignItemsPrimary = {
 // }
 
 
-const alignContentPrimary = {
-    'AUTO': '#center',
-    'SPACE_BETWEEN': '#space-between'
-}
+// const alignContentPrimary = {
+//     'AUTO': '#center',
+//     'SPACE_BETWEEN': '#space-between'
+// }

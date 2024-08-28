@@ -1,8 +1,8 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import buildRescript from "./BuildDom/CodeGen";
-import { RescriptBuildTree } from "./BuildDom/Types";
+import { buildDomTree } from "./BuildDom/CodeGen";
+import { DomTree, Language } from "./BuildDom/Types";
 
 // This file holds the main code for plugins. Code in this file has access to
 // the *figma document* via the figma global object.
@@ -21,19 +21,7 @@ figma.ui.onmessage =  async (msg: {type: string}) => {
   // One way of distinguishing between different types of messages sent from
   // your HTML page is to use an object with a "type" property like this.
   if (msg.type === 'generate-code') {
-    const rescriptNode:RescriptBuildTree = {
-      type: "View",
-      props: {
-        props: [],
-        textStyle: [],
-        styles: []
-      },
-      childrens: [],
-      parent: undefined,
-      id : "root",
-      kind: "Node"
-    }
-    buildRescript(figma.currentPage.selection,rescriptNode)
+    buildDomTree(figma.currentPage.selection, Language.Rescript)
   } else if (msg.type === 'close') {
     figma.closePlugin();
   } else if (msg.type === 'notify-copy') {
