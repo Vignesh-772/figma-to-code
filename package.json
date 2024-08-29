@@ -1,5 +1,5 @@
 {
-  "name": "figma-rescript",
+  "name": "figma-to-code",
   "version": "1.0.3",
   "description": "Your Figma Plugin",
   "main": "code.js",
