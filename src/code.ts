@@ -1,8 +1,19 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
+/// <reference types="@figma/plugin-typings/plugin-api" />
 
 import { buildDomTree } from "./BuildDom/CodeGen";
-import { DomTree, Language } from "./BuildDom/Types";
+import { Language } from "./BuildDom/Types";
+
+declare global {
+  const figma: PluginAPI
+  const __html__: string
+  const __uiFiles__: {
+    [key: string]: string
+  }
+}
+
+export { }
 
 // This file holds the main code for plugins. Code in this file has access to
 // the *figma document* via the figma global object.
