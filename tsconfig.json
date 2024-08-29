@@ -7,10 +7,6 @@
     "jsx": "react",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/babel/types",
-      "./node_modules/@figma"
-    ]
+    "typeRoots": []
   }
 }
