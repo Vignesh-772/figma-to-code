@@ -1,7 +1,4 @@
-import { getImageNode, isImageNode } from "./Rescript/Image"
-import getTextProps from "./Rescript/Text"
 import { DomTree, Language, OutputTree } from "./Types"
-import getViewProps from "./Rescript/View"
 import { RescriptBuilder } from "./Rescript/RescriptBuilder";
 import { Builder } from "./Builder";
 
@@ -81,15 +78,6 @@ function handleFlex(builder:Builder, dom: SceneNode, currentDom: DomTree) {
                         ele.props.styles.push(builder.buildProp({key: "flex",value: "1.0"}))
                     }
                 })
-                
-                // const newChild: Array<DomTree | string> = []
-                // currentDom.childrens = currentDom.childrens.reduce((acc, curr, index) => {
-                //     acc.push(curr);
-                //     if (index < currentDom.childrens.length - 1) {
-                //         acc.push(flexElem(currentDom));
-                //     }
-                //     return acc;
-                // }, newChild);
             }
         }
     }
@@ -97,7 +85,7 @@ function handleFlex(builder:Builder, dom: SceneNode, currentDom: DomTree) {
 
 
 async function buildNodeOrLeaf(builder:Builder, dom: SceneNode, rescriptDom: DomTree) {
-    const type = getRescriptType(dom.type, dom);
+    const type = builder.getDomType(dom.type, dom);
     let currentDom: DomTree = type == "View" ? builder.getNode(type,rescriptDom,dom.id) : builder.getChild(type,rescriptDom,dom.id)
     if (type == "Text") {
         const parentDom: DomTree = builder.getNode("View",rescriptDom,dom.id + "_parent")
@@ -105,24 +93,17 @@ async function buildNodeOrLeaf(builder:Builder, dom: SceneNode, rescriptDom: Dom
         currentDom.parent = parentDom
     }
     if (currentDom.type == "Text") {
-        currentDom.props = getTextProps(builder,dom)
+        currentDom.props = builder.getTextProps(builder,dom)
         currentDom.childrens.push((dom as TextNode).characters)
     } else if (currentDom.type == "Svg.SvgXml") {
-        await getImageNode(builder,dom, currentDom).then(() => {
+        await builder.getImageNode(builder,dom, currentDom).then(() => {
         }).catch((err) => {
             console.log("getImageNode err", err)
         })
     }
-    getViewProps(builder,dom, currentDom)
+    builder.getViewProps(builder,dom, currentDom)
     if (type == "Text" && currentDom.parent) {
         currentDom = currentDom.parent;
     }
     return currentDom;
-}
-
-function getRescriptType(type: string, dom: SceneNode) {
-    switch (type) {
-        case "TEXT": return "Text"
-        default: return isImageNode(dom) ? "Svg.SvgXml" : "View"
-    }
 }

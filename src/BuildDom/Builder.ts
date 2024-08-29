@@ -1,6 +1,6 @@
-import { DomTree, Props } from "./Types";
+import { DomProps, DomTree, Props } from "./Types";
 
-export type Builder = PropBuilder&DomNodeBuilder;
+export type Builder = PropBuilder&DomBuilder;
 
 export interface PropBuilderParams {
     key:string, 
@@ -13,7 +13,12 @@ export interface PropBuilder {
     buildProp(params:PropBuilderParams): Props;
 }
 
-export interface DomNodeBuilder {
+export interface DomBuilder {
     getNode(type: string, parent: DomTree | undefined, id: string,): DomTree
     getChild(type: string, parent: DomTree | undefined, id: string,): DomTree
+    getTextProps(builder :Builder,dom: SceneNode):DomProps
+    getImageNode (builder :Builder, dom: SceneNode, rescriptBuildTree: DomTree):Promise<void>
+    getViewProps(builder:Builder,figmaDom: SceneNode,resultDom: DomTree):void
+    getDomType(type: string, dom: SceneNode):string
 }
+
