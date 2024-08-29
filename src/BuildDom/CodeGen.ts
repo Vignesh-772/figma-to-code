@@ -51,7 +51,7 @@ async function generateCode(builder:Builder,dom: SceneNode, rescriptDom: DomTree
         }
         handleFlex(builder,dom, currentDom)
         const wrapEle = currentDom.props.styles.filter(a => a.key == "flexDirection")
-        if (wrapEle.length > 0 && wrapEle[0].value == "#column") {
+        if (wrapEle.length > 0 && wrapEle[0].value == "#column" || wrapEle[0].value == "column") {
             currentDom.props.styles = currentDom.props.styles.filter(a => a.key != "flexWrap")
         }
         if (rescriptDom.type != "Svg.SvgXml") {
