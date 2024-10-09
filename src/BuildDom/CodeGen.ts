@@ -1,6 +1,7 @@
 import { DomTree, Language, OutputTree } from "./Types"
 import { RescriptBuilder } from "./Rescript/RescriptBuilder";
 import { Builder } from "./Builder";
+import { TypeScriptBuilder } from "./Typescript/TypeScriptBuilder";
 
 export async function buildDomTree(figmaNode: ReadonlyArray<SceneNode>, lang: Language) {
     const builder = getBuilderInstanceByLanguage(lang) ;
@@ -16,7 +17,7 @@ export async function buildDomTree(figmaNode: ReadonlyArray<SceneNode>, lang: La
 function getBuilderInstanceByLanguage(lang: Language):Builder {
     switch (lang) {
         case Language.Rescript: return new RescriptBuilder(); 
-        case Language.TypeScript: return new RescriptBuilder(); 
+        case Language.TypeScript: return new TypeScriptBuilder(); 
         case Language.Javascript: return new RescriptBuilder();
     }
   }
